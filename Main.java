@@ -1,77 +1,99 @@
-class QueueLinkedList {
-    private Node front;
-    private Node rear;
+class QueueArray {
+    private int[] arr;
+    private int size;
+    private int rear;
+    private int front;
 
-    public class Node {
-        int data;
-        Node next;
-        Node(int data){
-            this.data = data;
-            this.next = null;
-        }
+    public QueueArray(int capacity) {
+        arr = new int[capacity];
+        size = 0;
+        front = 0;
+        rear = -1;
     }
 
-
+    // Enqueue
     public void enqueue(int value) {
-        Node newNode = new Node(value);
-
-        if (rear == null) {
-            front = rear = newNode;
-        } else {
-            rear.next = newNode;
-            rear = newNode;
+        if (size == arr.length) {
+            resize();
         }
+        rear++;
+        arr[rear] = value;
+        size++;
         System.out.println(value + " enqueued");
     }
 
-
+    // Dequeue
     public int dequeue() {
-        if (front == null) {
+        if (isEmpty()) {
             System.out.println("Queue Underflow");
             return -1;
         }
 
-        int removed = front.data;
-        front = front.next;
+        int removed = arr[front];
 
-        if (front == null) rear = null;
+        // shift elements
+        for (int i = 0; i < rear; i++) {
+            arr[i] = arr[i + 1];
+        }
 
+        rear--;
+        size--;
         return removed;
     }
 
-
+    // Peek
     public int peek() {
-        if (front == null) return -1;
-        return front.data;
+        if (isEmpty()) {
+            return -1;
+        }
+        return arr[front];
     }
 
+    // isEmpty
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    // Resize array
+    private void resize() {
+        int newSize = arr.length * 2;
+        int[] newArr = new int[newSize];
+
+        for (int i = 0; i < size; i++) {
+            newArr[i] = arr[i];
+        }
+
+        arr = newArr;
+        System.out.println("Queue resized to " + newSize);
+    }
+
+    // Print queue
     public void printQueue() {
         System.out.print("Queue: ");
-        Node temp = front;
-        while (temp != null) {
-            System.out.print(temp.data + " ");
-            temp = temp.next;
+        for (int i = 0; i <= rear; i++) {
+            System.out.print(arr[i] + " ");
         }
         System.out.println();
     }
 }
+
+// ===================== MAIN CLASS =====================
 public class Main {
     public static void main(String[] args) {
-        QueueLinkedList queue = new QueueLinkedList();
 
-        queue.enqueue(10);
-        queue.enqueue(20);
-        queue.enqueue(30);
+        QueueArray queue = new QueueArray(5);
+
+        queue.enqueue(5);
+        queue.enqueue(6);
+        queue.enqueue(7);
+        queue.enqueue(8);
+        queue.enqueue(9);
 
         queue.printQueue();
 
-        System.out.println("Dequeued: " + queue.dequeue());
+        queue.dequeue();
         queue.printQueue();
 
-        System.out.println("Front element: " + queue.peek());
-
-        queue.dequeue();
-        queue.dequeue();
-        queue.dequeue();
+        System.out.println("Is Queue Empty? " + queue.isEmpty());
     }
 }
