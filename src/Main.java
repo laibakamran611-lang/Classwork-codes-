@@ -1,128 +1,133 @@
-package dsaaignment;
+// ================= QUEUE USING ARRAY =================
+class QueueArray {
+    private int[] arr;
+    private int size;
+    private int rear;
+    private int front;
 
-// ================= Node Class =================
-class Node {
-    int data;
-    Node left, right;
-
-    Node(int data) {
-        this.data = data;
-        left = right = null;
-    }
-}
-
-// ================= BST Operations =================
-class BST {
-
-    // Insert
-    public static Node insert(Node root, int val) {
-        if (root == null) return new Node(val);
-        if (val < root.data) root.left = insert(root.left, val);
-        else root.right = insert(root.right, val);
-        return root;
+    public QueueArray(int capacity) {
+        arr = new int[capacity];
+        size = 0;
+        front = 0;
+        rear = -1;
     }
 
-    // Inorder Traversal
-    public static void inorder(Node root) {
-        if (root == null) return;
-        inorder(root.left);
-        System.out.print(root.data + " ");
-        inorder(root.right);
-    }
-
-    // Preorder Traversal
-    public static void preorder(Node root) {
-        if (root == null) return;
-        System.out.print(root.data + " ");
-        preorder(root.left);
-        preorder(root.right);
-    }
-
-    // Postorder Traversal
-    public static void postorder(Node root) {
-        if (root == null) return;
-        postorder(root.left);
-        postorder(root.right);
-        System.out.print(root.data + " ");
-    }
-
-    // Search
-    public static boolean search(Node root, int key) {
-        if (root == null) return false;
-        if (root.data == key) return true;
-        if (key < root.data) return search(root.left, key);
-        else return search(root.right, key);
-    }
-
-    // Find Minimum
-    public static Node findMinNode(Node root) {
-        while (root.left != null)
-            root = root.left;
-        return root;
-    }
-
-    // Delete
-    public static Node delete(Node root, int key) {
-        if (root == null) return null;
-
-        if (key < root.data) root.left = delete(root.left, key);
-        else if (key > root.data) root.right = delete(root.right, key);
-        else {
-            // Node with only one child or no child
-            if (root.left == null) return root.right;
-            else if (root.right == null) return root.left;
-
-            // Node with two children: Get inorder successor
-            Node temp = findMinNode(root.right);
-            root.data = temp.data;
-            root.right = delete(root.right, temp.data);
+    public void enqueue(int value) {
+        if (size == arr.length) {
+            resize();
         }
-        return root;
+        arr[++rear] = value;
+        size++;
+        System.out.println(value + " enqueued (Array)");
     }
 
-    // Height
-    public static int height(Node root) {
-        if (root == null) return 0;
-        return 1 + Math.max(height(root.left), height(root.right));
+    public int dequeue() {
+        if (isEmpty()) {
+            System.out.println("Queue Underflow");
+            return -1;
+        }
+
+        int removed = arr[front];
+
+        for (int i = 0; i < rear; i++) {
+            arr[i] = arr[i + 1];
+        }
+
+        rear--;
+        size--;
+        return removed;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    private void resize() {
+        int[] newArr = new int[arr.length * 2];
+        for (int i = 0; i < size; i++) {
+            newArr[i] = arr[i];
+        }
+        arr = newArr;
+        System.out.println("Queue resized");
+    }
+
+    public void printQueue() {
+        System.out.print("Array Queue: ");
+        for (int i = 0; i <= rear; i++) {
+            System.out.print(arr[i] + " ");
+        }
+        System.out.println();
     }
 }
 
-// ================= Main Class =================
+// ================= QUEUE USING LINKED LIST =================
+class QueueLinkedList {
+    private Node front, rear;
+
+    class Node {
+        int data;
+        Node next;
+        Node(int data) {
+            this.data = data;
+        }
+    }
+
+    public void enqueue(int value) {
+        Node newNode = new Node(value);
+        if (rear == null) {
+            front = rear = newNode;
+        } else {
+            rear.next = newNode;
+            rear = newNode;
+        }
+        System.out.println(value + " enqueued (LinkedList)");
+    }
+
+    public int dequeue() {
+        if (front == null) {
+            System.out.println("Queue Underflow");
+            return -1;
+        }
+
+        int removed = front.data;
+        front = front.next;
+        if (front == null) rear = null;
+        return removed;
+    }
+
+    public void printQueue() {
+        System.out.print("LinkedList Queue: ");
+        Node temp = front;
+        while (temp != null) {
+            System.out.print(temp.data + " ");
+            temp = temp.next;
+        }
+        System.out.println();
+    }
+}
+
+// ===================== MAIN CLASS (ONLY ONE) =====================
 public class Main {
     public static void main(String[] args) {
-        Node root = null;
 
-        // Insert elements
-        int[] values = {50, 30, 70, 20, 40, 60, 80};
-        for (int val : values) {
-            root = BST.insert(root, val);
-        }
+        // Queue using Array
+        QueueArray qa = new QueueArray(5);
+        qa.enqueue(5);
+        qa.enqueue(6);
+        qa.enqueue(7);
+        qa.printQueue();
+        qa.dequeue();
+        qa.printQueue();
 
-        // Traversals
-        System.out.print("Inorder Traversal: ");
-        BST.inorder(root);
         System.out.println();
 
-        System.out.print("Preorder Traversal: ");
-        BST.preorder(root);
-        System.out.println();
-
-        System.out.print("Postorder Traversal: ");
-        BST.postorder(root);
-        System.out.println();
-
-        // Search
-        int key = 60;
-        System.out.println("Search " + key + ": " + BST.search(root, key));
-
-        // Delete
-        System.out.println("Deleting 30...");
-        root = BST.delete(root, 30);
-        System.out.print("Inorder After Deletion: ");
-        BST.inorder(root);
-        System.out.println();
-
-        // Height
-        System.out.println("Height of Tree: " + BST.height(root));
+        // Queue using Linked List
+        QueueLinkedList ql = new QueueLinkedList();
+        ql.enqueue(10);
+        ql.enqueue(20);
+        ql.enqueue(30);
+        ql.printQueue();
+        ql.dequeue();
+        ql.printQueue();
     }
 }
